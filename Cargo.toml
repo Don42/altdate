@@ -1,0 +1,17 @@
+[project]
+name = "altdate"
+version = "0.0.1"
+authors = ["don <don@0xbeef.org>"]
+
+[dependencies]
+docopt = "*"
+rustc-serialize = "*"
+time = "*"
+chrono = "0.2"
+
+[lib]
+name = "libddate"
+path = "src/lib.rs"
+[[bin]]
+name = "ddate"
+path = "src/main.rs"
