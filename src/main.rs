@@ -31,8 +31,9 @@ USAGE:
     ddate [options] date <date>
 
 Options:
-    --help          Dispaly this help message and exit
-    --version       Output version information and exit
+    -h --help               Dispaly this help message and exit
+    -v --version            Output version information and exit
+    -d --discordian         Switch to output discordian dates. This is the default.
 ";
 
 #[derive(Debug, RustcDecodable)]
@@ -41,6 +42,7 @@ struct Args {
     arg_date: Option<String>,
     flag_help: bool,
     flag_version: bool,
+    flag_discordian: bool,
 }
 
 fn main() {
