@@ -3,7 +3,7 @@ extern crate chrono;
 extern crate docopt;
 extern crate rustc_serialize;
 extern crate time;
-extern crate libddate;
+extern crate libaltdate;
 
 // Standard library imports
 
