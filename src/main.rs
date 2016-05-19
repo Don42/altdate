@@ -10,7 +10,7 @@ extern crate libaltdate;
 //Crate imports
 use chrono::{NaiveDate, Datelike};
 use docopt::Docopt;
-use libddate::ddate;
+use libaltdate::ddate;
 
 const YEAR_OFFSET: i32 = 1900;
 
