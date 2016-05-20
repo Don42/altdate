@@ -27,22 +27,22 @@ const USAGE: &'static str = "
 ddate
 
 USAGE:
-    ddate [options] [<timestamp>]
-    ddate [options] date <date>
+    ddate [options] [<date>]
 
 Options:
     -h --help               Dispaly this help message and exit
     -v --version            Output version information and exit
-    -d --discordian         Switch to output discordian dates. This is the default.
+    -d --discordian         Switch to output discordian dates. This is the default
+    -t --timestamp          Date specifies a timestamp, instead of an isodate
 ";
 
 #[derive(Debug, RustcDecodable)]
 struct Args {
-    arg_timestamp: Option<i64>,
     arg_date: Option<String>,
     flag_help: bool,
     flag_version: bool,
     flag_discordian: bool,
+    flag_timestamp: bool,
 }
 
 fn main() {
@@ -53,19 +53,24 @@ fn main() {
         println!("{}", VERSION);
         return;
         }
-    let date = if args.arg_date.is_some() {
-        let input_date = NaiveDate::parse_from_str(args.arg_date.unwrap().as_str(),
-                                                   "%Y-%m-%d").unwrap();
-        ddate::convert(input_date.ordinal0() as u16,
-                       input_date.year() as i32).unwrap()
-    } else {
-        let greg_date = match args.arg_timestamp {
-            Some(t) => time::at(time::Timespec {sec: t, nsec: 0}),
-            None => time::now(),
-        };
-        ddate::convert(greg_date.tm_yday as u16,
-                                  greg_date.tm_year + YEAR_OFFSET).unwrap()
+
+    let input_date = match args.arg_date {
+        None => {
+            let today = chrono::offset::local::Local::today();
+            today.naive_local()
+        },
+        Some(raw_date) => if args.flag_timestamp {
+            let timestamp = time::at(time::Timespec{
+                    sec: raw_date.parse().expect("Timestamp"), nsec: 0});
+            NaiveDate::from_yo(timestamp.tm_year + YEAR_OFFSET, timestamp.tm_yday as u32)
+        } else {
+            NaiveDate::parse_from_str(raw_date.as_str(), "%Y-%m-%d")
+                       .expect("Can't parse date")
+        },
+
     };
+    let date = ddate::convert(input_date.ordinal0() as u16,
+                   input_date.year() as i32).unwrap();
     println!("{:?}, ", date);
 }
 
