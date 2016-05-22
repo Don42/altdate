@@ -45,6 +45,36 @@ struct Args {
     flag_timestamp: bool,
 }
 
+
+#[derive(Debug)]
+enum InputType {
+    Iso6801,
+    UnixTimestamp,
+}
+
+
+fn get_input_type(args: &Args) -> InputType {
+    if args.flag_timestamp {
+        InputType::UnixTimestamp
+    } else {
+        InputType::Iso6801
+    }
+}
+
+
+fn parse_date(raw_date: &String, input_type: InputType) -> NaiveDate {
+    match input_type {
+        InputType::UnixTimestamp => {
+            let timestamp = time::at(time::Timespec{
+                sec: raw_date.parse().expect("Timestamp"), nsec: 0});
+            NaiveDate::from_yo(timestamp.tm_year + YEAR_OFFSET, timestamp.tm_yday as u32)
+        },
+        InputType::Iso6801 => NaiveDate::parse_from_str(raw_date.as_str(), "%Y-%m-%d")
+                                        .expect("Can't parse date")
+    }
+}
+
+
 fn main() {
     let args: Args = Docopt::new(USAGE)
                              .and_then(|d| d.decode())
@@ -54,19 +84,15 @@ fn main() {
         return;
         }
 
+    let input_type = get_input_type(&args);
+    println!("Input Type: {:?}", input_type);
+
     let input_date = match args.arg_date {
         None => {
             let today = chrono::offset::local::Local::today();
             today.naive_local()
         },
-        Some(raw_date) => if args.flag_timestamp {
-            let timestamp = time::at(time::Timespec{
-                    sec: raw_date.parse().expect("Timestamp"), nsec: 0});
-            NaiveDate::from_yo(timestamp.tm_year + YEAR_OFFSET, timestamp.tm_yday as u32)
-        } else {
-            NaiveDate::parse_from_str(raw_date.as_str(), "%Y-%m-%d")
-                       .expect("Can't parse date")
-        },
+        Some(raw_date) => parse_date(&raw_date, input_type),
 
     };
     let date = ddate::convert(input_date.ordinal0() as u16,
