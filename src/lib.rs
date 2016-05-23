@@ -22,7 +22,7 @@ pub mod ddate {
     }
 
 #[derive(Debug)]
-    pub struct DiscordianTime {
+    pub struct DiscordianDate {
         season: Season,
         day: u8,
         year_day: u16,
@@ -32,7 +32,7 @@ pub mod ddate {
     }
 
 
-    pub fn convert(nday: u16, nyear: i32) -> Option<DiscordianTime> {
+    pub fn convert(nday: u16, nyear: i32) -> Option<DiscordianDate> {
         let year = nyear + 1166;
         let year_day = nday + 1;  // Switch to one-based
 
@@ -49,7 +49,7 @@ pub mod ddate {
             let week_day = week_day(nday);
             let day = ((nday % 73) + 1) as u8;
             let week = Some((nday / 5) as u8);
-            return Some(DiscordianTime {season: season, day: day,
+            return Some(DiscordianDate {season: season, day: day,
                                  year_day: year_day, year: year,
                                  week: week, week_day: week_day})
         } else {
@@ -84,7 +84,7 @@ pub mod ddate {
                     _ => panic!("Day out of range: {}", nday)
             };
 
-            return Some(DiscordianTime {season: season, day: day,
+            return Some(DiscordianDate {season: season, day: day,
                                  year_day: year_day, year: year,
                                  week: week, week_day: week_day})
 

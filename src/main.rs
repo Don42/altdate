@@ -27,21 +27,54 @@ const USAGE: &'static str = "
 ddate
 
 USAGE:
-    ddate [options] [<timestamp>]
-    ddate [options] date <date>
+    ddate [options] [<date>]
 
 Options:
-    --help          Dispaly this help message and exit
-    --version       Output version information and exit
+    -h --help               Dispaly this help message and exit
+    -v --version            Output version information and exit
+    -d --discordian         Switch to output discordian dates. This is the default
+    -t --timestamp          Date specifies a timestamp, instead of an isodate
 ";
 
 #[derive(Debug, RustcDecodable)]
 struct Args {
-    arg_timestamp: Option<i64>,
     arg_date: Option<String>,
     flag_help: bool,
     flag_version: bool,
+    flag_discordian: bool,
+    flag_timestamp: bool,
 }
+
+
+#[derive(Debug)]
+enum InputType {
+    Iso6801,
+    UnixTimestamp,
+}
+
+
+fn get_input_type(args: &Args) -> InputType {
+    if args.flag_timestamp {
+        InputType::UnixTimestamp
+    } else {
+        InputType::Iso6801
+    }
+}
+
+
+fn parse_date(raw_date: &String, input_type: InputType) -> NaiveDate {
+    match input_type {
+        InputType::UnixTimestamp => {
+            let timestamp = time::at(time::Timespec{
+                sec: raw_date.parse().expect("Could not parse timestamp"),
+                nsec: 0});
+            NaiveDate::from_yo(timestamp.tm_year + YEAR_OFFSET, timestamp.tm_yday as u32)
+        },
+        InputType::Iso6801 => NaiveDate::parse_from_str(raw_date.as_str(), "%Y-%m-%d")
+                                        .expect("Could not parse date")
+    }
+}
+
 
 fn main() {
     let args: Args = Docopt::new(USAGE)
@@ -51,19 +84,19 @@ fn main() {
         println!("{}", VERSION);
         return;
         }
-    let date = if args.arg_date.is_some() {
-        let input_date = NaiveDate::parse_from_str(args.arg_date.unwrap().as_str(),
-                                                   "%Y-%m-%d").unwrap();
-        ddate::convert(input_date.ordinal0() as u16,
-                       input_date.year() as i32).unwrap()
-    } else {
-        let greg_date = match args.arg_timestamp {
-            Some(t) => time::at(time::Timespec {sec: t, nsec: 0}),
-            None => time::now(),
-        };
-        ddate::convert(greg_date.tm_yday as u16,
-                                  greg_date.tm_year + YEAR_OFFSET).unwrap()
+
+    let input_type = get_input_type(&args);
+
+    let input_date = match args.arg_date {
+        None => {
+            let today = chrono::offset::local::Local::today();
+            today.naive_local()
+        },
+        Some(raw_date) => parse_date(&raw_date, input_type),
+
     };
+    let date = ddate::convert(input_date.ordinal0() as u16,
+                   input_date.year() as i32).unwrap();
     println!("{:?}, ", date);
 }
 
