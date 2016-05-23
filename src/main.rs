@@ -3,14 +3,16 @@ extern crate chrono;
 extern crate docopt;
 extern crate rustc_serialize;
 extern crate time;
-extern crate libaltdate;
 
 // Standard library imports
 
-//Crate imports
+// Local modules
+mod altdate;
+
+// Crate imports
 use chrono::{NaiveDate, Datelike};
 use docopt::Docopt;
-use libaltdate::ddate;
+use altdate::ddate;
 
 const YEAR_OFFSET: i32 = 1900;
 

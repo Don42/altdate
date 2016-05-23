@@ -10,8 +10,8 @@ time = "*"
 chrono = "0.2"
 
 [lib]
-name = "libaltdate"
-path = "src/altdate.rs"
+name = "altdate"
+path = "src/altdate/mod.rs"
 [[bin]]
 name = "ddate"
 path = "src/main.rs"
