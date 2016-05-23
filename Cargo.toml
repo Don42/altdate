@@ -11,7 +11,7 @@ chrono = "0.2"
 
 [lib]
 name = "libaltdate"
-path = "src/lib.rs"
+path = "src/altdate.rs"
 [[bin]]
 name = "ddate"
 path = "src/main.rs"
