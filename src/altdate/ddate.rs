@@ -107,3 +107,29 @@ fn is_leap_year(year_ce: i32) -> bool{
     let has_factor = |n| year_ce % n == 0;
     return has_factor(4) && !has_factor(100) || has_factor(400)
 }
+
+mod test {
+    #[test]
+    fn test_leap_year_positive() {
+        assert!(super::is_leap_year(2004));
+        assert!(super::is_leap_year(2008));
+        assert!(super::is_leap_year(2012));
+        assert!(super::is_leap_year(2016));
+    }
+
+    #[test]
+    fn test_leap_year_century() {
+        assert!(super::is_leap_year(2000));
+        assert!(!super::is_leap_year(1900));
+        assert!(!super::is_leap_year(1800));
+        assert!(!super::is_leap_year(2100));
+    }
+
+    #[test]
+    fn test_leap_year_negative() {
+        assert!(!super::is_leap_year(1998));
+        assert!(!super::is_leap_year(1999));
+        assert!(!super::is_leap_year(2014));
+        assert!(!super::is_leap_year(2015));
+    }
+}
