@@ -2,17 +2,15 @@
 extern crate chrono;
 extern crate docopt;
 extern crate rustc_serialize;
-extern crate time;
-extern crate libaltdate;
 
 // Standard library imports
 
-//Crate imports
-use chrono::{NaiveDate, Datelike};
-use docopt::Docopt;
-use libaltdate::ddate;
+// Local modules
+mod altdate;
 
-const YEAR_OFFSET: i32 = 1900;
+// Crate imports
+use chrono::Datelike;
+use docopt::Docopt;
 
 static VERSION: &'static str = "ddate (RUST implementaion of gnucoreutils) 0.1
 Copyright (C) 2016 Marco Kaulea
@@ -46,32 +44,11 @@ struct Args {
 }
 
 
-#[derive(Debug)]
-enum InputType {
-    Iso6801,
-    UnixTimestamp,
-}
-
-
-fn get_input_type(args: &Args) -> InputType {
+fn get_input_type(args: &Args) -> altdate::InputType {
     if args.flag_timestamp {
-        InputType::UnixTimestamp
+        altdate::InputType::UnixTimestamp
     } else {
-        InputType::Iso6801
-    }
-}
-
-
-fn parse_date(raw_date: &String, input_type: InputType) -> NaiveDate {
-    match input_type {
-        InputType::UnixTimestamp => {
-            let timestamp = time::at(time::Timespec{
-                sec: raw_date.parse().expect("Could not parse timestamp"),
-                nsec: 0});
-            NaiveDate::from_yo(timestamp.tm_year + YEAR_OFFSET, timestamp.tm_yday as u32)
-        },
-        InputType::Iso6801 => NaiveDate::parse_from_str(raw_date.as_str(), "%Y-%m-%d")
-                                        .expect("Could not parse date")
+        altdate::InputType::Iso6801
     }
 }
 
@@ -92,10 +69,10 @@ fn main() {
             let today = chrono::offset::local::Local::today();
             today.naive_local()
         },
-        Some(raw_date) => parse_date(&raw_date, input_type),
+        Some(raw_date) => altdate::parse_date(&raw_date, input_type),
 
     };
-    let date = ddate::convert(input_date.ordinal0() as u16,
+    let date = altdate::ddate::convert(input_date.ordinal0() as u16,
                    input_date.year() as i32).unwrap();
     println!("{:?}, ", date);
 }
