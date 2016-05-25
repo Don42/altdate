@@ -1,5 +1,5 @@
 
-#[derive(Debug)]
+#[derive(Debug,PartialEq)]
 enum Day {
     Sweetmorn,
     Boomtime,
@@ -18,6 +18,7 @@ enum Season {
     TheAftermath,
     StTibsDay,
 }
+
 
 #[derive(Debug)]
 pub struct DiscordianDate {
@@ -103,12 +104,26 @@ fn week_day(nday: u16) -> Day{
 }
 
 
-fn is_leap_year(year_ce: i32) -> bool{
+fn is_leap_year(year_ce: i32) -> bool {
     let has_factor = |n| year_ce % n == 0;
     return has_factor(4) && !has_factor(100) || has_factor(400)
 }
 
+#[cfg(test)]
 mod test {
+
+    #[test]
+    fn test_week_day() {
+        assert_eq!(super::week_day(0), super::Day::Sweetmorn);
+        assert_eq!(super::week_day(1), super::Day::Boomtime);
+        assert_eq!(super::week_day(2), super::Day::Pungenday);
+        assert_eq!(super::week_day(3), super::Day::PricklePrickle);
+        assert_eq!(super::week_day(4), super::Day::SettingOrange);
+        assert_eq!(super::week_day(10), super::Day::Sweetmorn);
+        assert_eq!(super::week_day(12), super::Day::Pungenday);
+        assert_eq!(super::week_day(21), super::Day::Boomtime);
+    }
+
     #[test]
     fn test_leap_year_positive() {
         assert!(super::is_leap_year(2004));
