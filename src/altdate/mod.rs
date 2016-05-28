@@ -23,6 +23,9 @@ pub enum InputType {
 }
 
 
+/// Parses a string to a date
+///
+/// Returns a date with astronomicaly numbered years. This means there is a year zero.
 pub fn parse_date(raw_date: &String, input_type: InputType) -> NaiveDate {
     match input_type {
         InputType::UnixTimestamp => {

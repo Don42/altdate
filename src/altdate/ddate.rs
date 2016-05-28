@@ -1,4 +1,5 @@
 
+/// Enum containing all discordian Days, including StTibsDay
 #[derive(Debug,PartialEq)]
 enum Day {
     Sweetmorn,
@@ -9,6 +10,7 @@ enum Day {
     StTibsDay,
 }
 
+/// Enum containing all discordian Seasons, including StTibsDay
 #[derive(Debug,PartialEq)]
 enum Season {
     Chaos,
@@ -29,9 +31,11 @@ pub struct DiscordianDate {
     day: u8,
     /// Day of the discordian year, zero-based
     year_day: u16,
-    /// Discordian year
+    /// Discordian year, which includes a year zero
     year: i32,
+    /// Day of the discordian week
     week_day: Day,
+    /// Week of the discordian year, or None for StTibsDay
     week: Option<u8>,
 }
 
@@ -103,6 +107,14 @@ pub fn convert(nday: u16, nyear: i32) -> Option<DiscordianDate> {
 }
 
 
+/// Return the weekday for a given day in the discordian year
+///
+/// This function will not correct for StTibsDay. All dates after StTibsDay
+/// need to be reduced by one.
+///
+/// # Arguments
+/// * `nday` - Days after January 1st, starting at zero
+///
 fn week_day(nday: u16) -> Day{
     match nday % 5 {
         0 => Day::Sweetmorn,
@@ -115,8 +127,17 @@ fn week_day(nday: u16) -> Day{
 }
 
 
-fn is_leap_year(year_ce: i32) -> bool {
-    let has_factor = |n| year_ce % n == 0;
+/// Determines if the supplied year is a leap year
+///
+/// There is a year zero before year one. But the result of the
+/// leap year calculation is undefined before the switch to the
+/// gregorian calendar (1582 CE)
+///
+/// # Arguments
+/// * `year` - Astronomicaly numbered year. This means there is a year zero
+///
+fn is_leap_year(year: i32) -> bool {
+    let has_factor = |n| year % n == 0;
     return has_factor(4) && !has_factor(100) || has_factor(400)
 }
 
