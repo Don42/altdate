@@ -44,6 +44,7 @@ struct Args {
 }
 
 
+/// Determines which time format should be parsed
 fn get_input_type(args: &Args) -> altdate::InputType {
     if args.flag_timestamp {
         altdate::InputType::UnixTimestamp

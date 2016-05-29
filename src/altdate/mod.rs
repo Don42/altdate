@@ -9,6 +9,7 @@ const YEAR_OFFSET: i32 = 1900;
 
 pub mod ddate;
 
+/// Enum containing all supported calendars
 #[allow(dead_code)]
 #[derive(Debug)]
 enum Calendar {
@@ -16,6 +17,7 @@ enum Calendar {
 }
 
 
+/// Enum containing all the supported time input formats
 #[derive(Debug)]
 pub enum InputType {
     Iso6801,
