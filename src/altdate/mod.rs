@@ -9,6 +9,7 @@ const YEAR_OFFSET: i32 = 1900;
 
 pub mod ddate;
 
+/// Enum containing all supported calendars
 #[allow(dead_code)]
 #[derive(Debug)]
 enum Calendar {
@@ -16,6 +17,7 @@ enum Calendar {
 }
 
 
+/// Enum containing all the supported time input formats
 #[derive(Debug)]
 pub enum InputType {
     Iso6801,
@@ -23,6 +25,9 @@ pub enum InputType {
 }
 
 
+/// Parses a string to a date
+///
+/// Returns a date with astronomicaly numbered years. This means there is a year zero.
 pub fn parse_date(raw_date: &String, input_type: InputType) -> NaiveDate {
     match input_type {
         InputType::UnixTimestamp => {

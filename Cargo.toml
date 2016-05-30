@@ -13,5 +13,5 @@ chrono = "0.2"
 name = "altdate"
 path = "src/altdate/mod.rs"
 [[bin]]
-name = "ddate"
+name = "altdate"
 path = "src/main.rs"

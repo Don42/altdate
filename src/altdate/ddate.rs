@@ -1,4 +1,5 @@
 
+/// Enum containing all discordian Days, including StTibsDay
 #[derive(Debug,PartialEq)]
 enum Day {
     Sweetmorn,
@@ -9,7 +10,8 @@ enum Day {
     StTibsDay,
 }
 
-#[derive(Debug)]
+/// Enum containing all discordian Seasons, including StTibsDay
+#[derive(Debug,PartialEq)]
 enum Season {
     Chaos,
     Discord,
@@ -20,20 +22,33 @@ enum Season {
 }
 
 
-#[derive(Debug)]
+/// Representation for a Discordian Date
+#[derive(Debug,PartialEq)]
 pub struct DiscordianDate {
+    /// Season of the discordian year
     season: Season,
+    /// Day of the discordian Season, zero-based
     day: u8,
+    /// Day of the discordian year, zero-based
     year_day: u16,
+    /// Discordian year, which includes a year zero
     year: i32,
+    /// Day of the discordian week
     week_day: Day,
+    /// Week of the discordian year, or None for StTibsDay
     week: Option<u8>,
 }
 
 
+/// Converts a year and day to a Discordian Date
+///
+/// # Arguments
+/// * `nday` - Days after January 1st, starting at zero
+/// * `nyear` - Astronomicaly numbered year. This means there is a year zero
+///
 pub fn convert(nday: u16, nyear: i32) -> Option<DiscordianDate> {
     let year = nyear + 1166;
-    let year_day = nday + 1;  // Switch to one-based
+    let year_day = nday;
 
     if !is_leap_year(nyear) {
         let season = match nday {
@@ -46,7 +61,7 @@ pub fn convert(nday: u16, nyear: i32) -> Option<DiscordianDate> {
         };
 
         let week_day = week_day(nday);
-        let day = ((nday % 73) + 1) as u8;
+        let day = (nday % 73) as u8;
         let week = Some((nday / 5) as u8);
         return Some(DiscordianDate {season: season, day: day,
                              year_day: year_day, year: year,
@@ -71,8 +86,8 @@ pub fn convert(nday: u16, nyear: i32) -> Option<DiscordianDate> {
 
         let day = match nday {
                 0 ... 58 => nday,
-                59 => 1,
-                60 ... 365 => (nday - 1) % 73 + 1,
+                59 => 0,
+                60 ... 365 => (nday - 1) % 73,
                 _ => panic!("Day out of range: {}", nday)
         } as u8;
 
@@ -92,6 +107,14 @@ pub fn convert(nday: u16, nyear: i32) -> Option<DiscordianDate> {
 }
 
 
+/// Return the weekday for a given day in the discordian year
+///
+/// This function will not correct for StTibsDay. All dates after StTibsDay
+/// need to be reduced by one.
+///
+/// # Arguments
+/// * `nday` - Days after January 1st, starting at zero
+///
 fn week_day(nday: u16) -> Day{
     match nday % 5 {
         0 => Day::Sweetmorn,
@@ -104,13 +127,63 @@ fn week_day(nday: u16) -> Day{
 }
 
 
-fn is_leap_year(year_ce: i32) -> bool {
-    let has_factor = |n| year_ce % n == 0;
+/// Determines if the supplied year is a leap year
+///
+/// There is a year zero before year one. But the result of the
+/// leap year calculation is undefined before the switch to the
+/// gregorian calendar (1582 CE)
+///
+/// # Arguments
+/// * `year` - Astronomicaly numbered year. This means there is a year zero
+///
+fn is_leap_year(year: i32) -> bool {
+    let has_factor = |n| year % n == 0;
     return has_factor(4) && !has_factor(100) || has_factor(400)
 }
 
 #[cfg(test)]
 mod test {
+
+    #[test]
+    fn test_convert() {
+        assert_eq!(super::DiscordianDate {season: super::Season::Chaos,
+                                          day: 0, year_day: 0, year: 3182,
+                                          week: Some(0), week_day: super::Day::Sweetmorn},
+                                          super::convert(0, 2016).unwrap());
+        assert_eq!(super::DiscordianDate {season: super::Season::Chaos,
+                                          day: 0, year_day: 0, year: 1166,
+                                          week: Some(0), week_day: super::Day::Sweetmorn},
+                                          super::convert(0, 0).unwrap());
+        assert_eq!(super::DiscordianDate {season: super::Season::Chaos,
+                                          day: 0, year_day: 0, year: 1165,
+                                          week: Some(0), week_day: super::Day::Sweetmorn},
+                                          super::convert(0, -1).unwrap());
+        assert_eq!(super::DiscordianDate {season: super::Season::Chaos,
+                                          day: 0, year_day: 0, year: 0,
+                                          week: Some(0), week_day: super::Day::Sweetmorn},
+                                          super::convert(0, -1166).unwrap());
+        assert_eq!(super::DiscordianDate {season: super::Season::Chaos,
+                                          day: 0, year_day: 0, year: -1,
+                                          week: Some(0), week_day: super::Day::Sweetmorn},
+                                          super::convert(0, -1167).unwrap());
+        assert_eq!(super::DiscordianDate {season: super::Season::StTibsDay,
+                                          day: 0, year_day: 59, year: 3166,
+                                          week: None, week_day: super::Day::StTibsDay},
+                                          super::convert(59, 2000).unwrap());
+        assert_eq!(super::DiscordianDate {season: super::Season::Chaos,
+                                          day: 59, year_day: 60, year: 3166,
+                                          week: Some(11), week_day: super::Day::SettingOrange},
+                                          super::convert(60, 2000).unwrap());
+        assert_eq!(super::DiscordianDate {season: super::Season::Discord,
+                                          day: 11, year_day: 85, year: 3166,
+                                          week: Some(16), week_day: super::Day::SettingOrange},
+                                          super::convert(85, 2000).unwrap());
+        assert_eq!(super::DiscordianDate {season: super::Season::TheAftermath,
+                                          day: 72, year_day: 365, year: 3166,
+                                          week: Some(72), week_day: super::Day::SettingOrange},
+                                          super::convert(365, 2000).unwrap());
+    }
+
 
     #[test]
     fn test_week_day() {
