@@ -109,6 +109,7 @@ fn is_leap_year(year_ce: i32) -> bool {
     return has_factor(4) && !has_factor(100) || has_factor(400)
 }
 
+
 #[cfg(test)]
 mod test {
 
