@@ -8,6 +8,7 @@ use chrono::{NaiveDate};
 const YEAR_OFFSET: i32 = 1900;
 
 pub mod ddate;
+pub mod format;
 
 #[allow(dead_code)]
 #[derive(Debug)]
