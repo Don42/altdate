@@ -1,3 +1,5 @@
+// This module were heavily influenced by rust-chrono by Kang Seonghoon
+// chrono::format::strftime
 
 use super::{Item, Fixed};
 

@@ -1,5 +1,5 @@
-// This module and its submodules where heavily influenced by rust-chrono by Kang Seonghoon
-
+// This module and its submodules were heavily influenced by rust-chrono by Kang Seonghoon
+// chrono::format
 
 /// Fixed-format item types.
 ///
@@ -24,4 +24,6 @@ macro_rules! lit { ($x:expr) => (Item::Literal($x)) }
 macro_rules! sp { ($x:expr) => (Item::Space($x)) }
 macro_rules! fix { ($x:ident) => (Item::Fixed(Fixed::$x)) }
 
+// Import needs to be after the macro definitions.
+// Maybe the macros should be moved into their own module.
 pub mod ddate;
